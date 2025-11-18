@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Prescription History - {{ patient.name }}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #3a86d7;
+            --secondary-color: #28a745;
+            --bg-light: #F3F4F6;
+            --bg-white: #FFFFFF;
+            --text-dark: #1F2937;
+            --text-light: #6B7280;
+            --border-color: #E5E7EB;
+            --shadow-color: rgba(0, 0, 0, 0.05);
+            --neu-bg: #ecf0f3;
+            --neu-shadow-1: 6px 6px 10px #d1d9e6, -6px -6px 10px rgba(226, 226, 227, 0.5);
+            --neu-shadow-2: inset 1px 1px 1px #d1d9e6, inset -1px -1px 1px rgba(224, 241, 254, 0.5);
+        }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--neu-bg);
+            color: var(--text-dark);
+            min-height: 100vh;
+        }
+        .main-container {
+            width: 95%;
+            max-width: 1000px;
+            margin: 120px auto 40px;
+            padding: 40px;
+            background: var(--neu-bg);
+            border-radius: 20px;
+            box-shadow: var(--neu-shadow-1);
+        }
+        .top-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: var(--neu-bg);
+            box-shadow: 6px 6px 10px #d1d9e6, -6px -6px 10px rgba(226, 226, 227, 0.5);
+            padding: 0 15px;
+            margin: 20px;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 70px;
+            z-index: 100;
+        }
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #0f0f0f;
+            font-family: 'Rowdies', sans-serif;
+        }
+        .log {
+            color: #19c541;
+        }
+        .nav-links {
+            display: flex;
+            align-items: center;
+        }
+        .nav-links a, .dropdown-link {
+            color: #000000;
+            text-decoration: none;
+            margin: 0 15px;
+            border-radius: 10px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            padding: 10px 15px;
+            display: flex;
+            align-items: center;
+            white-space: nowrap;
+        }
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .logout-btn {
+            background: linear-gradient(135deg, #FF7043, #D84315);
+            color: white;
+            margin-right: -2px;
+            padding: 8px 15px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 500;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+        }
+        .logout-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            filter: brightness(1.1);
+        }
+        .history-header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 15px;
+        }
+        .history-header h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--primary-color);
+        }
+        .history-header h2 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+        .history-section {
+            background-color: var(--bg-light);
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+        .record-card {
+            background-color: var(--bg-white);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            position: relative;
+        }
+        .record-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+        }
+        .record-card h3 {
+            font-size: 1.4rem;
+            color: #2d5a2f;
+            margin-bottom: 10px;
+        }
+        .record-card h4 {
+            font-size: 1.2rem;
+            color: #4a6c4b;
+            margin-bottom: 10px;
+        }
+        .record-card p {
+            font-size: 1rem;
+            color: var(--text-dark);
+            line-height: 1.6;
+        }
+        .record-card p strong {
+            color: var(--primary-color);
+        }
+        .medication-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        .medication-table th, .medication-table td {
+            border: 1px solid var(--border-color);
+            padding: 10px;
+            text-align: left;
+        }
+        .medication-table th {
+            background-color: #e2eaf0;
+            font-weight: 600;
+        }
+        .btn-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 20px;
+            margin-top: 20px;
+            background-color: var(--primary-color);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: background-color 0.3s ease;
+        }
+        .btn-back:hover {
+            background-color: #2e6bb4;
+        }
+        .main-actions {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 25px;
+            margin-top: -15px;
+            margin-bottom: 25px;
+        }
+        .main-actions a {
+            color: var(--text-light);
+            font-size: 1.8rem;
+            cursor: pointer;
+            transition: color 0.2s ease, transform 0.2s ease;
+        }
+        .main-actions a:hover {
+            color: var(--primary-color);
+            transform: scale(1.1);
+        }
+        .accordion-button {
+            background-color: #f0f0f0;
+            color: #444;
+            cursor: pointer;
+            padding: 15px;
+            width: 100%;
+            text-align: left;
+            border: none;
+            outline: none;
+            transition: 0.4s;
+            border-radius: 8px;
+            font-size: 1rem;
+            margin-top: 10px;
+            font-weight: 600;
+        }
+        .accordion-button.active, .accordion-button:hover {
+            background-color: #ddd;
+        }
+        .accordion-content {
+            padding: 0 18px;
+            background-color: white;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.2s ease-out;
+        }
+        .accordion-content p {
+            margin-bottom: 8px;
+        }
+        .accordion-content h5 {
+            margin-top: 15px;
+            color: var(--primary-color);
+        }
+        .lab-table {
+        width: 100%;
+        border-collapse: collapse; /* Merges adjacent borders into a single border */
+        margin-top: 15px; /* Adds space above the table */
+        border: 1px solid var(--border-color); /* Adds a border around the entire table */
+    }
+
+    .lab-table th, .lab-table td {
+        border: 1px solid var(--border-color); /* Adds borders to all cells */
+        padding: 12px; /* Adds space inside each cell */
+        text-align: left; /* Aligns text to the left */
+    }
+
+    .lab-table thead {
+        background-color: var(--bg-light); /* Adds a light background to the table header */
+    }
+
+    .lab-table th {
+        color: var(--text-dark); /* Sets the text color for the header cells */
+        font-weight: 600; /* Makes the header text bold */
+    }
+
+    .lab-table tbody tr:nth-child(even) {
+        background-color: #f9fafb; /* Adds a subtle zebra-striping effect for better readability */
+    }
+    </style>
+</head>
+<body>
+    <header class="top-nav">
+        <div class="logo">Psychia<span class="log">try</span></div>
+        <nav class="nav-links">
+            <a href="{{ url_for('psychiatry_dashboard') }}">Home</a>
+        </nav>
+        <div class="user-menu">
+            <span>{{ session.username }} ({{ session.user_role }})</span>
+            <a href="{{ url_for('logout') }}" class="logout-btn">Logout</a>
+        </div>
+    </header>
+    <main class="main-container" id="printable-area">
+    <div class="history-header">
+        <h1>Patient History</h1>
+        <h2>{{ patient.name }} (UHID: {{ patient.uhid }})</h2>
+        <div id="current-time" style="font-size: 1rem; color: #555; margin-top: 10px;"></div>
+    </div>
+<div class="prescription-section">
+    {% if prescriptions %}
+        <h3>Prescriptions History</h3>
+
+        <div class="record-card" style="border: 2px solid #28a745;">
+            <h3 style="color:#28a745;">Present Visit Prescription</h3>
+            <p><strong>Visit Date:</strong> {{ prescriptions[0].created_at.strftime('%d-%b-%Y %I:%M %p') }}</p>
+            <p><strong>Registered On:</strong>{{ patient.registration_date.strftime('%Y-%m-%d') }} </p>
+
+            <div class="data-grid">
+                <div class="data-item">Age: <span id="age-data">{{ patient.age }}</span></div>
+                <div class="data-item">Gender: <span id="gender-data">{{ patient.gender }}</span></div>
+                <div class="data-item">Mobile: <span id="phone-data">{{ patient.mobile_no }}</span></div>
+                <div class="data-item">Email: <span id="email-data">{{ patient.email }}</span></div>
+            </div>
+            
+
+            {% if prescriptions[0].assessment %}
+                <div class="record-details">
+                    <h4 class="sub-heading">Assessment</h4>
+                    <button class="accordion-button" onclick="toggleAccordion('assessment-present')">Show Assessment Details</button>
+                    <div id="assessment-present" class="accordion-content">
+                        {% if prescriptions[0].assessment.demographics %}
+                            <h4>Demographics</h4>
+                            {% for key, value in prescriptions[0].assessment.demographics.items() %}
+                                <p><strong>{{ key.replace('_', ' ').title() }}:</strong> {{ value }}</p>
+                            {% endfor %}
+                        {% endif %}
+
+                        {% if prescriptions[0].assessment.chief_complaints %}
+                            <h4>Chief Complaints</h4>
+                            {% for key, value in prescriptions[0].assessment.chief_complaints.items() %}
+                                {% if key == 'complaints' %}
+                                    <p><strong>{{ key.replace('_', ' ').title() }}:</strong> {{ ', '.join(value) }}</p>
+                                {% else %}
+                                    <p><strong>{{ key.replace('_', ' ').title() }}:</strong> {{ value }}</p>
+                                {% endif %}
+                            {% endfor %}
+                        {% endif %}
+
+                        {% if prescriptions[0].assessment.history %}
+                            <h4>History</h4>
+                            {% for key, value in prescriptions[0].assessment.history.items() %}
+                                <p><strong>{{ key.replace('_', ' ').title() }}:</strong> {{ value }}</p>
+                            {% endfor %}
+                        {% endif %}
+
+                        {% if prescriptions[0].assessment.personal_history %}
+                            <h4>Personal History</h4>
+                            {% for key, value in prescriptions[0].assessment.personal_history.items() %}
+                                <p><strong>{{ key.replace('_', ' ').title() }}:</strong> {{ value }}</p>
+                            {% endfor %}
+                        {% endif %}
+
+                        {% if prescriptions[0].assessment.premorbid_personality %}
+                            <h4>Premorbid Personality</h4>
+                            {% for key, value in prescriptions[0].assessment.premorbid_personality.items() %}
+                                <p><strong>{{ key.replace('_', ' ').title() }}:</strong> {{ value }}</p>
+                            {% endfor %}
+                        {% endif %}
+
+                        {% if prescriptions[0].assessment.physical_exam %}
+                            <h4>Physical Examination</h4>
+                            {% for key, value in prescriptions[0].assessment.physical_exam.items() %}
+                                <p><strong>{{ key.replace('_', ' ').title() }}:</strong> {{ value }}</p>
+                            {% endfor %}
+                        {% endif %}
+
+                        {% if prescriptions[0].assessment.mental_status %}
+                            <h5>Mental Status Examination</h5>
+                            {% for key, value in prescriptions[0].assessment.mental_status.items() %}
+                                <p><strong>{{ key.replace('_', ' ').title() }}:</strong> {{ value }}</p>
+                            {% endfor %}
+                        {% endif %}
+
+                        {% if prescriptions[0].assessment.cognitive_functions %}
+                            <h5>Cognitive Functions</h5>
+                            {% for key, value in prescriptions[0].assessment.cognitive_functions.items() %}
+                                <p><strong>{{ key.replace('_', ' ').title() }}:</strong> {{ value }}</p>
+                            {% endfor %}
+                        {% endif %}
+                        
+                        {% if prescriptions[0].assessment.previous_history %}
+                            <h4>Previous History</h4>
+                            {% for key, value in prescriptions[0].assessment.previous_history.items() %}
+                                <p><strong>{{ key.replace('_', ' ').title() }}:</strong> {{ value }}</p>
+                            {% endfor %}
+                        {% endif %}
+
+                        {% if prescriptions[0].assessment.scales %}
+                            <h4>Scales</h4>
+                            {% for key, value in prescriptions[0].assessment.scales.items() %}
+                                <p><strong>{{ key.replace('_', ' ').title() }}:</strong> {{ value }}</p>
+                            {% endfor %}
+                        {% endif %}
+
+                        {% if prescriptions[0].assessment.review_patient %}
+                            <p><strong>Review Patient:</strong> {{ prescriptions[0].assessment.review_patient }}</p>
+                        {% endif %}
+                        {% if prescriptions[0].assessment.review_patient_details %}
+                            <p><strong>Review Patient Details:</strong> {{ prescriptions[0].assessment.review_patient_details }}</p>
+                        {% endif %}
+                        {% if prescriptions[0].assessment.referral %}
+                            <p><strong>Referral:</strong> {{ prescriptions[0].assessment.referral }}</p>
+                        {% endif %}
+                        {% if prescriptions[0].assessment.referral_details %}
+                            <p><strong>Referral Details:</strong> {{ prescriptions[0].assessment.referral_details }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endif %}
+
+            {% if prescriptions[0].diagnosis.primary_diagnosis %}
+            <p><strong>Primary Diagnosis:</strong> {{ prescriptions[0].diagnosis.primary_diagnosis }}</p>
+            {% endif %}
+            {% if prescriptions[0].diagnosis.secondary_diagnosis %}
+            <p><strong>Secondary Diagnosis:</strong> {{ prescriptions[0].diagnosis.secondary_diagnosis }}</p>
+            {% endif %}
+            {% if prescriptions[0].psychotherapy.psychotherapy_plan %}
+            <p><strong>Psychotherapy Plan:</strong> {{ prescriptions[0].psychotherapy.psychotherapy_plan }}</p>
+            {% endif %}
+
+            {% if prescriptions[0].medications %}
+            <h4>Medications</h4>
+            <table class="medication-table">
+                <thead>
+                    <tr>
+                        <th>Medication Name</th>
+                        <th>Dose</th>
+                        <th>Frequency</th>
+                        <th>Instruction</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for medication in prescriptions[0].medications %}
+                    <tr>
+                        <td>{{ medication.name }}</td>
+                        <td>{{ medication.dosage }}</td>
+                        <td>{{ medication.frequency }}</td>
+                        <td>{{ medication.instruction }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p>No medications prescribed on this date.</p>
+            {% endif %}
+
+
+            {% if prescriptions[0].lab_report %}
+            <h4>Lab Reports & Scans</h4>
+            <div class="lab-report-card">
+                {% if prescriptions[0].lab_report.tests.summary %}
+                    <p><strong>Test Summary:</strong> {{ prescriptions[0].lab_report.tests.summary }}</p>
+                {% endif %}
+                {% if prescriptions[0].lab_report.tests.details %}
+                    <table class="lab-table">
+                        <thead>
+                            <tr>
+                                <th>Test Name</th>
+                                <th>Test Value</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for test in prescriptions[0].lab_report.tests.details %}
+                                <tr>
+                                    <td>{{ test.name }}</td>
+                                    <td>{{ test.value }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% endif %}
+                {% if prescriptions[0].lab_report.scans %}
+                    <p><strong>Scan Prescribed:</strong> {{ prescriptions[0].lab_report.scans.name }}</p>
+                    {% if prescriptions[0].lab_report.scans.summary %}
+                        <p><strong>Scan Summary:</strong> {{ prescriptions[0].lab_report.scans.summary }}</p>
+                    {% endif %}
+                    {% if prescriptions[0].lab_report.scans.tests_file %}
+                        <p><strong>Tests File:</strong> <a href="{{ url_for('static', filename='uploads/' + prescriptions[0].lab_report.scans.tests_file) }}" target="_blank">{{ prescriptions[0].lab_report.scans.tests_file }}</a></p>
+                    {% endif %}
+                    {% if prescriptions[0].lab_report.scans.scans_file %}
+                        <p><strong>Scans File:</strong> <a href="{{ url_for('static', filename='uploads/' + prescriptions[0].lab_report.scans.scans_file) }}" target="_blank">{{ prescriptions[0].lab_report.scans.scans_file }}</a></p>
+                    {% endif %}
+                {% endif %}
+            </div>
+            {% endif %}
+
+        </div>
+
+        {% if prescriptions|length > 1 %}
+        <button onclick="togglePrevious()" style="margin: 15px 0; padding: 10px 20px; border: 1px solid #555; border-radius: 8px; background: #f9f9f9; cursor: pointer;">
+            Show Previous Visit Prescriptions ({{ prescriptions|length - 1 }})
+        </button>
+
+        <div id="previous-prescriptions" style="display: none; margin-top: 15px;">
+            {% for prescription in prescriptions[1:] %}
+            <div class="record-card" style="border: 1px solid #555;">
+                <h3 style="color:#555;">Previous Visit Prescription</h3>
+                <p><strong>Visit Date:</strong> {{ prescription.created_at.strftime('%d-%b-%Y %I:%M %p') }}</p>
+                <p><strong>Registered On:</strong> {{ patient.registration_date.strftime('%Y-%m-%d') }}</p>
+
+                 
+                <div class="data-grid">
+                    <div class="data-item">Age: <span id="age-data">{{ patient.age }}</span></div>
+                    <div class="data-item">Gender: <span id="gender-data">{{ patient.gender }}</span></div>
+                    <div class="data-item">Mobile: <span id="phone-data">{{ patient.mobile_no }}</span></div>
+                    <div class="data-item">Email: <span id="email-data">{{ patient.email }}</span></div>
+                </div>
+                
+
+                {% if prescription.assessment %}
+                    <div class="record-details">
+                        <h4 class="sub-heading">Assessment</h4>
+                        <button class="accordion-button" onclick="toggleAccordion('assessment-{{ loop.index }}')">Show Assessment Details</button>
+                        <div id="assessment-{{ loop.index }}" class="accordion-content">
+                            {% if prescription.assessment.demographics %}
+                                <h5>Demographics</h5>
+                                {% for key, value in prescription.assessment.demographics.items() %}
+                                    <p><strong>{{ key.replace('_', ' ').title() }}:</strong> {{ value }}</p>
+                                {% endfor %}
+                            {% endif %}
+
+                            {% if prescription.assessment.chief_complaints %}
+                                <h5>Chief Complaints</h5>
+                                {% for key, value in prescription.assessment.chief_complaints.items() %}
+                                    {% if key == 'complaints' %}
+                                        <p><strong>{{ key.replace('_', ' ').title() }}:</strong> {{ ', '.join(value) }}</p>
+                                    {% else %}
+                                        <p><strong>{{ key.replace('_', ' ').title() }}:</strong> {{ value }}</p>
+                                    {% endif %}
+                                {% endfor %}
+                            {% endif %}
+
+                            {% if prescription.assessment.history %}
+                                <h5>History</h5>
+                                {% for key, value in prescription.assessment.history.items() %}
+                                    <p><strong>{{ key.replace('_', ' ').title() }}:</strong> {{ value }}</p>
+                                {% endfor %}
+                            {% endif %}
+
+                            {% if prescription.assessment.personal_history %}
+                                <h5>Personal History</h5>
+                                {% for key, value in prescription.assessment.personal_history.items() %}
+                                    <p><strong>{{ key.replace('_', ' ').title() }}:</strong> {{ value }}</p>
+                                {% endfor %}
+                            {% endif %}
+
+                            {% if prescription.assessment.premorbid_personality %}
+                                <h5>Premorbid Personality</h5>
+                                {% for key, value in prescription.assessment.premorbid_personality.items() %}
+                                    <p><strong>{{ key.replace('_', ' ').title() }}:</strong> {{ value }}</p>
+                                {% endfor %}
+                            {% endif %}
+
+                            {% if prescription.assessment.physical_exam %}
+                                <h5>Physical Examination</h5>
+                                {% for key, value in prescription.assessment.physical_exam.items() %}
+                                    <p><strong>{{ key.replace('_', ' ').title() }}:</strong> {{ value }}</p>
+                                {% endfor %}
+                            {% endif %}
+
+                            {% if prescription.assessment.mental_status %}
+                                <h5>Mental Status Examination</h5>
+                                {% for key, value in prescription.assessment.mental_status.items() %}
+                                    <p><strong>{{ key.replace('_', ' ').title() }}:</strong> {{ value }}</p>
+                                {% endfor %}
+                            {% endif %}
+
+                            {% if prescription.assessment.cognitive_functions %}
+                                <h5>Cognitive Functions</h5>
+                                {% for key, value in prescription.assessment.cognitive_functions.items() %}
+                                    <p><strong>{{ key.replace('_', ' ').title() }}:</strong> {{ value }}</p>
+                                {% endfor %}
+                            {% endif %}
+                            
+                            {% if prescription.assessment.previous_history %}
+                                <h5>Previous History</h5>
+                                {% for key, value in prescription.assessment.previous_history.items() %}
+                                    <p><strong>{{ key.replace('_', ' ').title() }}:</strong> {{ value }}</p>
+                                {% endfor %}
+                            {% endif %}
+
+                            {% if prescription.assessment.scales %}
+                                <h5>Scales</h5>
+                                {% for key, value in prescription.assessment.scales.items() %}
+                                    <p><strong>{{ key.replace('_', ' ').title() }}:</strong> {{ value }}</p>
+                                {% endfor %}
+                            {% endif %}
+
+                            {% if prescription.assessment.review_patient %}
+                                <p><strong>Review Patient:</strong> {{ prescription.assessment.review_patient }}</p>
+                            {% endif %}
+                            {% if prescription.assessment.review_patient_details %}
+                                <p><strong>Review Patient Details:</strong> {{ prescription.assessment.review_patient_details }}</p>
+                            {% endif %}
+                            {% if prescription.assessment.referral %}
+                                <p><strong>Referral:</strong> {{ prescription.assessment.referral }}</p>
+                            {% endif %}
+                            {% if prescription.assessment.referral_details %}
+                                <p><strong>Referral Details:</strong> {{ prescription.assessment.referral_details }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endif %}
+
+
+                {% if prescription.diagnosis.primary_diagnosis %}
+                <p><strong>Primary Diagnosis:</strong> {{ prescription.diagnosis.primary_diagnosis }}</p>
+                {% endif %}
+                {% if prescription.diagnosis.secondary_diagnosis %}
+                <p><strong>Secondary Diagnosis:</strong> {{ prescription.diagnosis.secondary_diagnosis }}</p>
+                {% endif %}
+                {% if prescription.psychotherapy.psychotherapy_plan %}
+                <p><strong>Psychotherapy Plan:</strong> {{ prescription.psychotherapy.psychotherapy_plan }}</p>
+                {% endif %}
+
+                {% if prescription.medications %}
+                <h4>Medications</h4>
+                <table class="medication-table">
+                    <thead>
+                        <tr>
+                            <th>Medication Name</th>
+                            <th>Dose</th>
+                            <th>Frequency</th>
+                            <th>Instruction</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for medication in prescription.medications %}
+                        <tr>
+                            <td>{{ medication.name }}</td>
+                            <td>{{ medication.dosage }}</td>
+                            <td>{{ medication.frequency }}</td>
+                            <td>{{ medication.instruction }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <p>No medications prescribed on this date.</p>
+                {% endif %}
+
+                
+                {% if prescription.lab_report %}
+                <h4>Lab Reports & Scans</h4>
+                <div class="lab-report-card">
+                    {% if prescription.lab_report.tests.summary %}
+                        <p><strong>Test Summary:</strong> {{ prescription.lab_report.tests.summary }}</p>
+                    {% endif %}
+                    {% if prescription.lab_report.tests.details %}
+                        <table class="lab-table">
+                            <thead>
+                                <tr>
+                                    <th>Test Name</th>
+                                    <th>Test Value</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for test in prescription.lab_report.tests.details %}
+                                    <tr>
+                                        <td>{{ test.name }}</td>
+                                        <td>{{ test.value }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    {% endif %}
+                    {% if prescription.lab_report.scans %}
+                        <p><strong>Scan Prescribed:</strong> {{ prescription.lab_report.scans.name }}</p>
+                        {% if prescription.lab_report.scans.summary %}
+                            <p><strong>Scan Summary:</strong> {{ prescription.lab_report.scans.summary }}</p>
+                        {% endif %}
+                        {% if prescription.lab_report.scans.tests_file %}
+                            <p><strong>Tests File:</strong> <a href="{{ url_for('static', filename='uploads/' + prescription.lab_report.scans.tests_file) }}" target="_blank">{{ prescription.lab_report.scans.tests_file }}</a></p>
+                        {% endif %}
+                        {% if prescription.lab_report.scans.scans_file %}
+                            <p><strong>Scans File:</strong> <a href="{{ url_for('static', filename='uploads/' + prescription.lab_report.scans.scans_file) }}" target="_blank">{{ prescription.lab_report.scans.scans_file }}</a></p>
+                        {% endif %}
+                    {% endif %}
+                </div>
+                {% endif %}
+
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    {% endif %}
+</div>
+<a href="{{ url_for('psychiatry_dashboard') }}" class="btn-back"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
+</main>
+
+<script>
+function togglePrevious() {
+    const section = document.getElementById("previous-prescriptions");
+    const button = event.target;
+    if (section.style.display === "none") {
+        section.style.display = "block";
+        button.innerText = "Hide Previous Visit Prescriptions";
+    } else {
+        section.style.display = "none";
+        button.innerText = "Show Previous Visit Prescriptions ({{ prescriptions|length - 1 }})";
+    }
+}
+
+function toggleAccordion(id) {
+    const content = document.getElementById(id);
+    const button = event.target;
+    if (content.style.maxHeight) {
+        content.style.maxHeight = null;
+        button.innerText = "Show Assessment Details";
+    } else {
+        content.style.maxHeight = content.scrollHeight + "px";
+        button.innerText = "Hide Assessment Details";
+    }
+}
+
+function updateTime() {
+    const now = new Date();
+    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' };
+    document.getElementById('current-time').innerText = 'Current Time: ' + now.toLocaleDateString('en-US', options);
+}
+
+document.addEventListener('DOMContentLoaded', (event) => {
+    updateTime();
+    setInterval(updateTime, 1000);
+});
+</script>
+</body>
+</html>

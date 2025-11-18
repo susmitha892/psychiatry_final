@@ -1,0 +1,552 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Lab Reports & Scans</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #3a86d7;
+            --secondary-color: #28a745;
+            --success-color: #28a745;
+            --danger-color: #EF4444;
+            --info-color: #6366F1;
+            --bg-light: #F3F4F6;
+            --bg-white: #FFFFFF;
+            --text-dark: #1F2937;
+            --text-light: #6B7280;
+            --border-color: #E5E7EB;
+            --shadow-color: rgba(0, 0, 0, 0.05);
+            --neu-bg: #ecf0f3;
+            --neu-shadow-1: 6px 6px 10px #d1d9e6, -6px -6px 10px rgba(226, 226, 227, 0.5);
+            --neu-shadow-2: inset 1px 1px 1px #d1d9e6, inset -1px -1px 1px rgba(224, 241, 254, 0.5);
+        }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--neu-bg);
+            color: var(--text-dark);
+            min-height: 100vh;
+        }
+        .main-container {
+            width: 95%;
+            max-width: 1200px;
+            margin: 120px auto 40px;
+            padding: 40px;
+            background: var(--neu-bg);
+            border-radius: 20px;
+            box-shadow: var(--neu-shadow-1);
+        }
+        .top-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: var(--neu-bg);
+            box-shadow: 6px 6px 10px #d1d9e6, -6px -6px 10px rgba(226, 226, 227, 0.5);
+            padding: 0 15px;
+            margin: 20px;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 70px;
+            z-index: 100;
+        }
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #0f0f0f;
+            font-family: 'Rowdies', sans-serif;
+        }
+        .log {
+            color: #19c541;
+        }
+        .nav-links {
+            display: flex;
+            align-items: center;
+        }
+        .nav-links a, .dropdown-link {
+            color: #000000;
+            text-decoration: none;
+            margin: 0 15px;
+            border-radius: 10px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            padding: 10px 15px;
+            display: flex;
+            align-items: center;
+            white-space: nowrap;
+        }
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        .dropdown-link .fas {
+            margin-left: 8px;
+            transition: transform 0.3s ease;
+        }
+        .dropdown-link.active .fas {
+            transform: rotate(180deg);
+        }
+        .dropdown-content {
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%) translateY(10px);
+            min-width: 180px;
+            background-color: var(--neu-bg);
+            border-radius: 10px;
+            box-shadow: var(--neu-shadow-1);
+            z-index: 99;
+            overflow: hidden;
+            max-height: 0;
+            opacity: 0;
+            pointer-events: none;
+            transition: max-height 0.4s ease-in-out, opacity 0.4s ease, transform 0.4s ease;
+        }
+        .dropdown-content.show {
+            max-height: 200px;
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+            pointer-events: auto;
+        }
+        .dropdown-content a {
+            display: block;
+            padding: 12px 15px;
+            text-decoration: none;
+            color: var(--text-dark);
+            font-weight: 500;
+            transition: background-color 0.2s ease, color 0.2s ease;
+        }
+        .dropdown-content a:hover {
+            background-color: #e2eaf0;
+            color:#2d5a2f;
+        }
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .logout-btn {
+            background: linear-gradient(135deg, #FF7043, #D84315);
+            color: white;
+            margin-right: -2px;
+            padding: 8px 15px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 500;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+        }
+        .logout-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            filter: brightness(1.1);
+        }
+        .form-title {
+            text-align: center;
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--primary-color);
+            margin-bottom: 30px;
+        }
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .patient-info {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+        .patient-info span {
+            font-weight: 400;
+        }
+        .form-section {
+            background-color: var(--bg-light);
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+        .form-section h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--primary-color);
+        }
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+        .form-group {
+            position: relative;
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+        .form-group input[type="text"],
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1rem;
+            outline: none;
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-white);
+            box-shadow: inset 2px 2px 5px #d1d9e6, inset -2px -2px 5px #fff;
+            transition: all 0.3s ease;
+        }
+        .form-group input[type="text"]:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            box-shadow: inset 2px 2px 5px #d1d9e6, inset -2px -2px 5px #fff, 0 0 0 2px var(--primary-color);
+        }
+        .dynamic-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        .dynamic-table th, .dynamic-table td {
+            border: 1px solid var(--border-color);
+            padding: 12px;
+            text-align: left;
+        }
+        .dynamic-table th {
+            background-color: #e2eaf0;
+            font-weight: 600;
+        }
+        .add-row-btn {
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: background-color 0.3s ease;
+        }
+        .add-row-btn:hover {
+            background-color: #218c39;
+        }
+        .btn-container {
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: transform 0.3s ease;
+        }
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        .btn-secondary {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            filter: brightness(1.1);
+        }
+        .success-message {
+            text-align: center;
+            color: var(--success-color);
+            font-weight: 600;
+            margin-top: 20px;
+            display: none;
+        }
+        .file-upload-section {
+            margin-top: 20px;
+        }
+        .file-upload-section input[type="file"] {
+            margin-top: 10px;
+        }
+        .note {
+            font-style: italic;
+            color: var(--text-light);
+            font-size: 0.9em;
+        }
+        @media (max-width: 768px) {
+            .btn-container {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="top-nav">
+        <div class="logo">Psychia<span class="log">try</span></div>
+        <nav class="nav-links">
+            <a href="{{ url_for('psychiatry_dashboard') }}">Home</a>
+        </nav>
+        <div class="user-menu">
+    <span>{{ session.username }} ({{ session.user_role }})</span>
+    <a href="{{ url_for('logout') }}" class="logout-btn">Logout</a>
+</div>
+    </header>
+
+    <main class="main-container">
+        <h2 class="form-title">Lab Reports & Scans</h2>
+
+        <div class="page-header">
+    <div class="patient-info">Patient ID: <span id="patient-uhid-display">{{ patient.uhid }}</span></div>
+    <div class="patient-info">Name: <span id="patient-name-display">{{ patient.name }}</span></div>
+    <div class="date-display">
+    <p><strong>Visit Date:</strong> {{ visiting_date.strftime('%Y-%m-%d') }}</p>
+</div>
+</div>
+
+        <form id="lab-report-form" action="{{ url_for('lab_reports_form', uhid=patient.uhid) }}" method="POST" enctype="multipart/form-data">
+    <div class="form-section">
+        <h3>Tests Prescribed</h3>
+        <table class="dynamic-table">
+            <thead>
+                <tr>
+                    <th>Test Name</th>
+                    <th>Test Value</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="tests-table-body">
+                {% if lab_report and lab_report.tests %}
+                    {% for test in lab_report.tests %}
+                    <tr>
+                        <td><input type="text" name="test_name_{{ loop.index }}" value="{{ test.name }}" placeholder="Test Name"></td>
+                        <td><input type="text" name="test_value_{{ loop.index }}" value="{{ test.value }}" placeholder="Test Value"></td>
+                        <td><button type="button" class="btn btn-danger remove-test-btn"><i class="fas fa-trash-alt"></i></button></td>
+                    </tr>
+                    {% endfor %}
+                {% endif %}
+            </tbody>
+        </table>
+        <button type="button" id="add-test-btn" class="add-row-btn"><i class="fas fa-plus-circle"></i> Add Test</button>
+        <div class="file-upload-section">
+            <label for="tests_file">Upload Test File <span class="note">(Optional)</span>:</label>
+            <input type="file" id="tests_file" name="tests_file">
+        </div>
+        <div class="form-group">
+    <label for="test_summary">Test Summary:</label>
+    <textarea id="test_summary" name="test_summary" class="form-control" rows="4" placeholder="Enter a summary of the test results..."></textarea>
+</div>
+    </div>
+
+    <div class="form-section">
+        <h3>Scans Prescribed</h3>
+        <div class="form-grid">
+            <div class="form-group">
+                <label for="scans_prescribed">Scans:</label>
+                <select id="scans_prescribed" name="scans_prescribed">
+                    <option value="" disabled selected>Select a scan or enter custom entry</option>
+                    <option value="MRI Brain" {% if lab_report and lab_report.scans and lab_report.scans.name == 'MRI Brain' %}selected{% endif %}>MRI Brain</option>
+                    <option value="CT Scan" {% if lab_report and lab_report.scans and lab_report.scans.name == 'CT Scan' %}selected{% endif %}>CT Scan</option>
+                    <option value="PET Scan" {% if lab_report and lab_report.scans and lab_report.scans.name == 'PET Scan' %}selected{% endif %}>PET Scan</option>
+                    <option value="Electroencephalogram (EEG)" {% if lab_report and lab_report.scans and lab_report.scans.name == 'Electroencephalogram (EEG)' %}selected{% endif %}>Electroencephalogram (EEG)</option>
+                    <option value="Other">Other</option>
+                </select>
+                <input type="text" name="scans_prescribed_other" class="custom-entry" placeholder="Custom entry..." style="{% if lab_report and lab_report.scans and lab_report.scans.name not in ['MRI Brain', 'CT Scan', 'PET Scan', 'Electroencephalogram (EEG)'] %}display:block;{% else %}display:none;{% endif %}" value="{{ lab_report.scans.name if lab_report and lab_report.scans and lab_report.scans.name not in ['MRI Brain', 'CT Scan', 'PET Scan', 'Electroencephalogram (EEG)'] else '' }}">
+            </div>
+        </div>
+        <div class="file-upload-section">
+            <label for="scans_file">Upload Scan File <span class="note">(Optional)</span>:</label>
+            <input type="file" id="scans_file" name="scans_file">
+        </div>
+        <div class="form-group">
+    <label for="scan_summary">Scan Summary:</label>
+    <textarea id="scan_summary" name="scan_summary" class="form-control" rows="4" placeholder="Enter a summary of the scan results..."></textarea>
+</div>
+    </div>
+
+    <div class="btn-container">
+        <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save</button>
+        <button type="button" class="btn btn-secondary" id="move-to-prescription-btn"><i class="fas fa-arrow-right"></i> Move to Prescription</button>
+    </div>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    {% for category, message in messages %}
+      <div class="alert alert-{{ category }}">{{ message }}</div>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+</form>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+
+        const form = document.getElementById('lab-report-form');
+
+form.addEventListener('input', () => {
+    // Get all form data, including dynamic rows
+    const formData = new FormData(form);
+    const formState = {};
+
+    // Standard inputs
+    for (const [key, value] of formData.entries()) {
+        formState[key] = value;
+    }
+
+    // Handle dynamic table data
+    const tests = [];
+    document.querySelectorAll('#tests-table-body tr').forEach((row, index) => {
+        const testNameInput = row.querySelector(`[name="test_name_${index + 1}"]`);
+        const testValueInput = row.querySelector(`[name="test_value_${index + 1}"]`);
+        if (testNameInput && testValueInput) {
+            tests.push({
+                name: testNameInput.value,
+                value: testValueInput.value
+            });
+        }
+    });
+    formState.dynamicTests = tests;
+
+    // Save state and current date
+    localStorage.setItem('labReportsFormState', JSON.stringify(formState));
+    localStorage.setItem('labReportsFormDate', new Date().toLocaleDateString());
+});
+
+// Function to load saved data from localStorage
+const loadSavedData = () => {
+    const savedDate = localStorage.getItem('labReportsFormDate');
+    const today = new Date().toLocaleDateString();
+
+    // Check if data exists and if it was saved today
+    if (savedDate === today) {
+        const savedState = JSON.parse(localStorage.getItem('labReportsFormState'));
+        if (savedState) {
+            // Restore static form data
+            for (const key in savedState) {
+                if (key !== 'dynamicTests') {
+                    const element = document.querySelector(`[name="${key}"]`);
+                    if (element) {
+                        if (element.type === 'file') continue; // Skip file inputs
+                        element.value = savedState[key];
+                    }
+                }
+            }
+
+            // Restore the dynamic test table
+            const testsTableBody = document.getElementById('tests-table-body');
+            testsTableBody.innerHTML = '';
+            let testCounter = 0;
+            if (savedState.dynamicTests) {
+                savedState.dynamicTests.forEach(test => {
+                    testCounter++;
+                    const newRow = testsTableBody.insertRow();
+                    newRow.innerHTML = `
+                        <td><input type="text" name="test_name_${testCounter}" value="${test.name}" placeholder="Test Name"></td>
+                        <td><input type="text" name="test_value_${testCounter}" value="${test.value}" placeholder="Test Value"></td>
+                        <td><button type="button" class="btn btn-danger remove-test-btn"><i class="fas fa-trash-alt"></i></button></td>
+                    `;
+                    newRow.querySelector('.remove-test-btn').addEventListener('click', () => {
+                        newRow.remove();
+                    });
+                });
+            }
+
+            // Trigger the "Other" option visibility
+            const scansSelect = document.getElementById('scans_prescribed');
+            const scansOtherInput = document.querySelector('[name="scans_prescribed_other"]');
+            if (scansSelect.value === 'Other') {
+                scansOtherInput.style.display = 'block';
+            }
+        }
+    } else {
+        // If it's a new day, clear the old data
+        localStorage.removeItem('labReportsFormState');
+        localStorage.removeItem('labReportsFormDate');
+    }
+};
+
+// Call the load function when the page loads
+loadSavedData();
+
+// Your existing DOMContentLoaded listener should wrap the rest of the code
+document.addEventListener('DOMContentLoaded', function() {
+    // ... (Your existing code here) ...
+});
+
+        // Function to handle "Other" option in dropdowns
+        const handleOtherOption = () => {
+            document.querySelectorAll('select').forEach(select => {
+                select.addEventListener('change', (e) => {
+                    const nextSibling = e.target.nextElementSibling;
+                    if (e.target.value === 'Other' && nextSibling && nextSibling.classList.contains('custom-entry')) {
+                        nextSibling.style.display = 'block';
+                    } else if (nextSibling && nextSibling.classList.contains('custom-entry')) {
+                        nextSibling.style.display = 'none';
+                        nextSibling.value = '';
+                    }
+                });
+            });
+        };
+        handleOtherOption();
+
+        // Dynamic test table logic
+        const addTestBtn = document.getElementById('add-test-btn');
+        const testsTableBody = document.getElementById('tests-table-body');
+        let testCounter = {{ lab_report.tests|length if lab_report and lab_report.tests else 0 }};
+
+        addTestBtn.addEventListener('click', () => {
+            testCounter++;
+            const newRow = testsTableBody.insertRow();
+            newRow.innerHTML = `
+                <td>
+                    <input type="text" name="test_name_${testCounter}" placeholder="Test Name">
+                </td>
+                <td>
+                    <input type="text" name="test_value_${testCounter}" placeholder="Test Value">
+                </td>
+                <td>
+                    <button type="button" class="btn btn-danger remove-test-btn"><i class="fas fa-trash-alt"></i></button>
+                </td>
+            `;
+            newRow.querySelector('.remove-test-btn').addEventListener('click', () => {
+                newRow.remove();
+            });
+        });
+
+        // Add event listeners for existing remove buttons (if any)
+        document.querySelectorAll('.remove-test-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                btn.closest('tr').remove();
+            });
+        });
+
+        // Move to Prescription button
+        document.getElementById('move-to-prescription-btn').addEventListener('click', function() {
+            window.location.href = "{{ url_for('prescription_summary', uhid=patient.uhid, visiting_date=visiting_date.strftime('%Y-%m-%d')) }}";
+        });
+    });
+</script>
+</body>
+</html>
